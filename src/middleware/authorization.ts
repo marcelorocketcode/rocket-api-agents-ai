@@ -1,20 +1,26 @@
-import { validateAuthorizationToken } from '@utils/jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
+
 import logger from '@utils/logger';
 import { StatusMsg } from '@utils/response';
-import { Request, Response, NextFunction } from 'express';
+import { validateAuthorizationToken } from '@utils/jsonwebtoken';
 
 export const authGuard = (req: Request, res: Response, next: NextFunction) => {
   try {
-    const Authorization = req.headers.Authorization as string | undefined;
-    if (!Authorization) throw 'Unauthorized';
+    const authorization = req.headers.Authorization as string | undefined;
 
-    const token = Authorization.replace("Bearer ", "");
+    logger.info("Authorization found: %s", authorization);
+
+    if (!authorization) throw 'Unauthorized';
+
+    const token = authorization.replace("Bearer ", "");
     const user = validateAuthorizationToken(token);
 
-    logger.info("User %s autheticated successful", user.name);
+    logger.info("User %s authenticated successful", user.name);
 
     return next();
-  } catch {
+  } catch (error) {
+    logger.error("Error found: %s", JSON.stringify(error));
+  
     return res.status(401).json({
       message: 'Unauthorized',
       result: null,
