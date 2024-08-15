@@ -6,7 +6,7 @@ import { validateAuthorizationToken } from '@utils/jsonwebtoken';
 
 export const authGuard = (req: Request, res: Response, next: NextFunction) => {
   try {
-    const authorization = req.headers.Authorization as string | undefined;
+    const authorization = req.headers.authorization as string | undefined;
 
     logger.info("Authorization found: %s", authorization);
 
