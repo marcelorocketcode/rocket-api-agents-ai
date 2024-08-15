@@ -2,13 +2,14 @@ import express, { Request, Response } from 'express';
 
 import logger from '@utils/logger';
 import { StatusMsg } from '@utils/response'
+import { authGuard } from 'middleware/authorization';
 
 const app = express();
 const port = process.env.PORT || 8081;
 
 app.use(express.json());
 
-app.get('/agents', (req: Request, res: Response) => {
+app.get('/agents', authGuard, (req: Request, res: Response) => {
   logger.info("Initializing request to get customer's agents")
 
   return res.status(200).json({
