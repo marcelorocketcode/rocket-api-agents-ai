@@ -1,0 +1,29 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/rocket-api-agents-ai:$COMMIT_SHA', '.']
+
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-cloud-run-rocket-api-agents-ai'
+    args: ['push', 'gcr.io/$PROJECT_ID/rocket-api-agents-ai:$COMMIT_SHA']
+    
+  # Deploy the container to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+    - 'run'
+    - 'deploy'
+    - 'rocket-api-agents-ai' 
+    - '--image'
+    - 'gcr.io/$PROJECT_ID/rocket-api-agents-ai:$COMMIT_SHA'
+    - '--region=us-central1'
+    - '--service-account'
+    - $_SERVICE_ACCOUNT_ID@$PROJECT_ID.iam.gserviceaccount.com
+    - '--env-vars-file=$_ENV_PATH'
+
+images:
+    - 'gcr.io/$PROJECT_ID/rocket-api-agents-ai:$COMMIT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
